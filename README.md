@@ -14,7 +14,7 @@ Instructions on how to use them in your own application are linked below.
 
 ## Installation
 
-Make sure the requirements above already install on your system.  
+Make sure the requirements above already installed on your system.  
 Clone the project to your directory and install the dependencies.
 
 ```bash
@@ -28,7 +28,6 @@ Copy the .env.example file and rename it to .env
 Change the config for your local server
 
 ```bash
-DB_HOST=      localhost
 DB_PORT=      3306
 DB_USER=      root
 DB_PASSWORD=
