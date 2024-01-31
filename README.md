@@ -9,7 +9,7 @@ Instructions on how to use them in your application are linked below.
 
 | Requirement | Version |
 | ----------- | ------- |
-| Go          | 1.18.4  |
+| Go          | 1.21.5  |
 | Mysql       | 8.0.35  |
 
 ## Installation
