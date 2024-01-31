@@ -10,7 +10,7 @@ Instructions on how to use them in your application are linked below.
 | Requirement | Version |
 | ----------- | ------- |
 | Go          | 1.18.4  |
-| Mysql       | 8.0.30  |
+| Mysql       | 8.0.35  |
 
 ## Installation
 
