@@ -19,7 +19,7 @@ type Name struct {
 }
 
 type Address struct {
-	ID          uint       `json:"address_id"`
+	ID          uint       `gorm:"primaryKey;auto_increment"`
 	City        string     `json:"city"`
 	Street      string     `json:"street"`
 	Number      string     `json:"number"`
@@ -28,7 +28,7 @@ type Address struct {
 }
 
 type GeoLocation struct {
-	ID  uint   `json:"geo_location_id"`
+	ID  uint   `gorm:"primaryKey;auto_increment"`
 	Lat string `json:"lat"`
 	Lng string `json:"lng"`
 }
