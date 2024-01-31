@@ -5,7 +5,7 @@ simple RestAPI with Go, Echo, Gorm, and MySQL
 ## Requirements
 
 Simple RestAPI is currently extended with the following requirements.  
-Instructions on how to use them in your own application are linked below.
+Instructions on how to use them in your application are linked below.
 
 | Requirement | Version |
 | ----------- | ------- |
@@ -14,12 +14,12 @@ Instructions on how to use them in your own application are linked below.
 
 ## Installation
 
-Make sure the requirements above already installed on your system.  
+Make sure the requirements above are already installed on your system.  
 Clone the project to your directory and install the dependencies.
 
 ```bash
-$ git clone https://github.com/wisnuuakbr/simple-rest-go-echo
-$ cd simple-rest-go-echo
+$ git clone https://github.com/sun01822/Store-RestAPI
+$ cd Store-RestAPI
 $ go mod tidy
 ```
 
@@ -31,7 +31,7 @@ Change the config for your local server
 DB_PORT=      3306
 DB_USER=      root
 DB_PASSWORD=
-DB_NAME=      altera-course
+DB_NAME=      store
 SERVER_PORT=  8080
 ```
 
