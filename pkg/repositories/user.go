@@ -60,9 +60,9 @@ func (u *userRepo) GetUsersInfo(model *gorm.Model) ([]models.UserInfo, error) {
 	userID := model.ID
 
 	if userID != 0 {
-		err = u.db.Raw("SELECT * FROM users Inner Join addresses on users.address_id = addresses.id Inner Join geo_locations on addresses.geo_location_id = geo_locations.id  where users.id = ?", userID, "and users.deleted_at is null").Scan(&users).Error
+		err = u.db.Raw("SELECT * FROM users Inner Join addresses on users.address_id = addresses.id Inner Join geo_locations on addresses.geo_location_id = geo_locations.id Inner Join names on users.name_id = names.id  where users.id = ?", userID, "and users.deleted_at is null").Scan(&users).Error
 	} else {
-		err = u.db.Raw("SELECT * FROM users Inner Join addresses on users.address_id = addresses.id Inner Join geo_locations on addresses.geo_location_id = geo_locations.id where users.deleted_at is null").Scan(&users).Error
+		err = u.db.Raw("SELECT * FROM users Inner Join addresses on users.address_id = addresses.id Inner Join geo_locations on addresses.geo_location_id = geo_locations.id Inner Join names on users.name_id = names.id where users.deleted_at is null").Scan(&users).Error
 	}
 	if err != nil {
 		return []models.UserInfo{}, err
@@ -160,6 +160,42 @@ func (u *userRepo) CreateGeoLocation(geoLocation *models.GeoLocation) error {
 // UpdateGeoLocation implements domain.IUserRepo.
 func (u *userRepo) UpdateGeoLocation(geoLocation *models.GeoLocation) error {
 	err := u.db.Save(&geoLocation).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
+// CreateName implements domain.IUserRepo.
+func (u *userRepo) CreateName(name *models.Name) error {
+	err := u.db.Create(&name).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetName implements domain.IUserRepo.
+func (u *userRepo) GetName(model *gorm.Model) ([]models.Name, error) {
+	var name []models.Name
+	var err error
+	nameID := model.ID
+	if nameID == 0 {
+		err = u.db.Find(&name).Error
+	} else {
+		err = u.db.Where("id = ?", nameID).Find(&name).Error
+	}
+	if err != nil {
+		return []models.Name{}, err
+	}
+	return name, nil
+}
+
+
+// UpdateName implements domain.IUserRepo.
+func (u *userRepo) UpdateName(name *models.Name) error {
+	err := u.db.Save(&name).Error
 	if err != nil {
 		return err
 	}
