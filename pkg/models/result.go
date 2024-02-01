@@ -14,5 +14,6 @@ type UserInfo struct {
 	Lat     string `json:"lat"`
 	Lng     string `json:"lng"`
 	Phone  string `json:"phone"`
-	Name   string `json:"name"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 }

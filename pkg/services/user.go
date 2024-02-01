@@ -85,10 +85,37 @@ func (service *userService) CreateAddress(address *models.Address) error {
 	return nil
 }
 
+// GetAddress implements domain.IUserService.
+func (service *userService) GetAddress(model *gorm.Model) ([]models.Address, error) {
+	var allAddress []models.Address
+	address, _ := service.repo.GetAddress(model)
+	if len(address) == 0 {
+		return nil, errors.New("no address found")
+	}
+	allAddress = append(allAddress, address...)
+	return allAddress, nil
+}
+
 // UpdateAddress implements domain.IUserService.
 func (service *userService) UpdateAddress(address *models.Address) error {
 	if err := service.repo.UpdateAddress(address); err != nil {
 		return errors.New("Address is not updated")
+	}
+	return nil
+}
+
+// CreateGeoLocation implements domain.IUserService.
+func (service *userService) CreateGeoLocation(geoLocation *models.GeoLocation) error {
+	if err := service.repo.CreateGeoLocation(geoLocation); err != nil {
+		return errors.New("GeoLocation is not created")
+	}
+	return nil
+}
+
+// UpdateGeoLocation implements domain.IUserService.
+func (service *userService) UpdateGeoLocation(geoLocation *models.GeoLocation) error {
+	if err := service.repo.UpdateGeoLocation(geoLocation); err != nil {
+		return errors.New("GeoLocation is not updated")
 	}
 	return nil
 }
