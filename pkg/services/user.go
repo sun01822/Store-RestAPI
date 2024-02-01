@@ -119,3 +119,31 @@ func (service *userService) UpdateGeoLocation(geoLocation *models.GeoLocation) e
 	}
 	return nil
 }
+
+// CreateName implements domain.IUserService.
+func (service *userService) CreateName(name *models.Name) error {
+	if err := service.repo.CreateName(name); err != nil {
+		return errors.New("Name is not created")
+	}
+	return nil
+}
+
+// GetName implements domain.IUserService.
+func (service *userService) GetName(model *gorm.Model) ([]models.Name, error) {
+	var allName []models.Name
+	name, _ := service.repo.GetName(model)
+	if len(name) == 0 {
+		return nil, errors.New("no name found")
+	}
+	allName = append(allName, name...)
+	return allName, nil
+}
+
+// UpdateName implements domain.IUserService.
+func (service *userService) UpdateName(name *models.Name) error {
+	if err := service.repo.UpdateName(name); err != nil {
+		return errors.New("Name is not updated")
+	}
+	return nil
+}
+

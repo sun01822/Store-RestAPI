@@ -35,11 +35,16 @@ func (us *userRoutes) initUserRoutes(e *echo.Echo) {
 
 	user.POST("/user/address/:id", us.userController.CreateAddress)
 	user.PUT("/user/address/:id", us.userController.UpdateAddress)
+	user.GET("/user/address/:id", us.userController.GetAddress)
 
 
 	user.POST("/user/address/geolocation/:id", us.userController.CreateGeoLocation)
-	user.GET("/user/address/:id", us.userController.GetAddress)
 	user.PUT("/user/address/geolocation/:id", us.userController.UpdateGeoLocation)
+
+	
+	user.POST("/user/name/:id", us.userController.CreateName)
+	user.PUT("/user/name/:id", us.userController.UpdateName)
+	user.GET("/user/name/:id", us.userController.GetName)
 }
 
 

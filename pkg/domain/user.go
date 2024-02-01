@@ -24,6 +24,11 @@ type IUserRepo interface {
 	CreateGeoLocation(geoLocation *models.GeoLocation) error
 	UpdateGeoLocation(geoLocation *models.GeoLocation) error
 
+
+	CreateName(name *models.Name) error
+	GetName(*gorm.Model)([]models.Name, error)
+	UpdateName(name *models.Name) error
+
 }
 
 // for service operation (response to contorller || call from controller)
@@ -43,4 +48,9 @@ type IUserService interface {
 
 	CreateGeoLocation(geoLocation *models.GeoLocation) error
 	UpdateGeoLocation(geoLocation *models.GeoLocation) error
+
+	CreateName(name *models.Name) error
+	GetName(*gorm.Model)([]models.Name, error)
+	UpdateName(name *models.Name) error
+	
 }

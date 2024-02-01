@@ -48,12 +48,12 @@ func (geoLocation UserGeoLocationRequest) Validate() error{
 	)
 }
 
-type NameRequest struct {
+type UserNameRequest struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 }
 
-func (name NameRequest) Validate() error{
+func (name UserNameRequest) Validate() error{
 	return validate.ValidateStruct(&name,
 		validate.Field(&name.FirstName, validate.Required, validate.Length(1, 50)),
 		validate.Field(&name.LastName, validate.Required, validate.Length(1, 50)),
