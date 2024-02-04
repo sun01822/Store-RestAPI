@@ -20,19 +20,6 @@ type IUserController interface {
 	DeleteUser(e echo.Context) error
 	UpdateUser(e echo.Context) error
 	LoginUser(e echo.Context) error
-	GetUsersInfo(e echo.Context) error
-	
-	CreateAddress(e echo.Context) error
-	UpdateAddress(e echo.Context) error
-	GetAddress(e echo.Context) error
-
-	CreateGeoLocation(e echo.Context) error
-	UpdateGeoLocation(e echo.Context) error
-
-	CreateName(e echo.Context) error
-	UpdateName(e echo.Context) error
-	GetName(e echo.Context) error
-
 }
 
 type userController struct {
@@ -80,19 +67,6 @@ func (controller *userController) GetUsers(e echo.Context) error {
 	return e.JSON(http.StatusOK, users)
 }
 
-// GetUsers implements IUserController.
-func (controller *userController) GetUsersInfo(e echo.Context) error {
-	tempUserID := e.QueryParam("userID")
-	UserID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil && tempUserID != "" {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	users, err := controller.Usersvc.GetUsersInfo(&gorm.Model{ID: uint(UserID)})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	return e.JSON(http.StatusOK, users)
-}
 
 // DeleteUser implements IUserController.
 func (controller *userController) DeleteUser(e echo.Context) error {
@@ -132,8 +106,8 @@ func (controller *userController) UpdateUser(e echo.Context) error {
 		Username:  reqUser.Username,
 		Password:  reqUser.Password,
 		Phone:     reqUser.Phone,
-		AddressID: reqUser.AddressID,
-		NameID:    reqUser.NameID,
+		Name:      models.Name{FirstName: reqUser.FirstName, LastName: reqUser.LastName},
+		Address:   models.Address{City: reqUser.City, Street: reqUser.Street, Number: reqUser.Number, Zip: reqUser.Zip, GeoLocation: models.GeoLocation{Lat: reqUser.Lat, Lng: reqUser.Lng}},
 	}
 
 	if updateUser.Username == "" {
@@ -148,13 +122,30 @@ func (controller *userController) UpdateUser(e echo.Context) error {
 	if updateUser.Phone == "" {
 		updateUser.Phone = existingUser[0].Phone
 	}
-	if updateUser.AddressID == 0 {
-		updateUser.AddressID = existingUser[0].AddressID
+	if updateUser.Name.FirstName == "" {
+		updateUser.Name.FirstName = existingUser[0].Name.FirstName
 	}
-	if updateUser.NameID == 0 {
-		updateUser.NameID = existingUser[0].NameID
+	if updateUser.Name.LastName == "" {
+		updateUser.Name.LastName = existingUser[0].Name.LastName
 	}
-	
+	if updateUser.Address.City == "" {
+		updateUser.Address.City = existingUser[0].Address.City
+	}
+	if updateUser.Address.Street == "" {
+		updateUser.Address.Street = existingUser[0].Address.Street
+	}
+	if updateUser.Address.Number == "" {
+		updateUser.Address.Number = existingUser[0].Address.Number
+	}
+	if updateUser.Address.Zip == "" {
+		updateUser.Address.Zip = existingUser[0].Address.Zip
+	}
+	if updateUser.Address.GeoLocation.Lat == "" {
+		updateUser.Address.GeoLocation.Lat = existingUser[0].Address.GeoLocation.Lat
+	}
+	if updateUser.Address.GeoLocation.Lng == "" {
+		updateUser.Address.GeoLocation.Lng = existingUser[0].Address.GeoLocation.Lng
+	}
 	if err := controller.Usersvc.UpdateUser(updateUser); err != nil {
 		return e.JSON(http.StatusBadRequest, err.Error())
 	}
@@ -192,288 +183,3 @@ func (controller *userController) LoginUser(e echo.Context) error {
 	}
 	return e.JSON(http.StatusOK, tokenString)
 }
-
-
-// CreateAddress implements IUserController.
-func (controller *userController) CreateAddress(e echo.Context) error {
-	tempUserID := e.Param("id")
-	UserID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	existingUser, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	if existingUser[0].AddressID != 0 {
-		return e.JSON(http.StatusBadRequest, "Address already exists")
-	}
-	reqUser := &types.UserAddressRequest{}
-	if err := e.Bind(reqUser); err != nil {
-		return e.JSON(http.StatusBadRequest, "Invalid data")
-	}
-	if err := reqUser.Validate(); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	address := &models.Address{
-		City:    reqUser.City,
-		Street:  reqUser.Street,
-		Number:  reqUser.Number,
-		Zip:     reqUser.Zip,
-	}
-	if err := controller.Usersvc.CreateAddress(address); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	updateUser := &models.User{
-		Model:     gorm.Model{ID: uint(UserID), UpdatedAt: time.Now(), CreatedAt: existingUser[0].CreatedAt, DeletedAt: existingUser[0].DeletedAt},
-		AddressID: address.ID,
-		Username: existingUser[0].Username,
-		Email: existingUser[0].Email,
-		Password: existingUser[0].Password,
-		Phone: existingUser[0].Phone,
-		NameID: existingUser[0].NameID,
-	}
-	if err := controller.Usersvc.UpdateUser(updateUser); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	return e.JSON(http.StatusOK, "Address created successfully")
-}
-
-// GetAddress implements IUserController.
-func (controller *userController) GetAddress(e echo.Context) error {
-	tempUserID := e.Param("id")
-	AddressID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	existingUser, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(AddressID)})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	address, err := controller.Usersvc.GetAddress(&gorm.Model{ID: existingUser[0].AddressID})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	return e.JSON(http.StatusOK, address)
-}
-
-
-// UpdateAddress implements IUserController.
-func (controller *userController) UpdateAddress(e echo.Context) error {
-	reqUser := &types.UserAddressRequest{}
-	if err := e.Bind(reqUser); err != nil {
-		return e.JSON(http.StatusBadRequest, "Invalid data")
-	}
-	if err := reqUser.Validate(); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	tempUserID := e.Param("id")
-	UserID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	existingUser, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	updateAddress := &models.Address{
-		ID: 	 existingUser[0].AddressID,
-		City:     reqUser.City,
-		Street:   reqUser.Street,
-		Number:   reqUser.Number,
-		Zip:      reqUser.Zip,
-	}
-	if err := controller.Usersvc.UpdateAddress(updateAddress); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	return e.JSON(http.StatusOK, "Address updated successfully")
-}
-
-// CreateGeoLocation implements IUserController.
-func (controller *userController) CreateGeoLocation(e echo.Context) error {
-	reqUser := &types.UserGeoLocationRequest{}
-	if err := e.Bind(reqUser); err != nil {
-		return e.JSON(http.StatusBadRequest, "Invalid data")
-	}
-	if err := reqUser.Validate(); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	tempUserID := e.Param("id")
-	UserID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	existingUser, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	if existingUser[0].AddressID == 0 {
-		return e.JSON(http.StatusBadRequest, "Address does not exist")
-	}
-	geoLocation := &models.GeoLocation{
-		Lat:     reqUser.Lat,
-		Lng:     reqUser.Lng,
-	}
-	if err := controller.Usersvc.CreateGeoLocation(geoLocation); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	updateUser := &models.User{
-		Model:     gorm.Model{ID: uint(UserID), UpdatedAt: time.Now(), CreatedAt: existingUser[0].CreatedAt, DeletedAt: existingUser[0].DeletedAt},
-		Username: existingUser[0].Username,
-		Email: existingUser[0].Email,
-		Password: existingUser[0].Password,
-		Phone: existingUser[0].Phone,
-		NameID: existingUser[0].NameID,
-		AddressID: existingUser[0].AddressID,
-	}
-	if err := controller.Usersvc.UpdateUser(updateUser); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	
-	existingUser2, err := controller.Usersvc.GetAddress(&gorm.Model{ID: existingUser[0].AddressID})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	if existingUser2[0].GeoLocationID != 0 {
-		return e.JSON(http.StatusBadRequest, "GeoLocation already exists")
-	}
-	updateAddress := &models.Address{
-		ID: 	 existingUser2[0].ID,
-		City:     existingUser2[0].City,
-		Street:   existingUser2[0].Street,
-		Number:   existingUser2[0].Number,
-		Zip:      existingUser2[0].Zip,
-		GeoLocationID: geoLocation.ID,
-	}
-	if err := controller.Usersvc.UpdateAddress(updateAddress); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	return e.JSON(http.StatusOK, "GeoLocation created successfully")
-}
-
-
-// UpdateGeoLocation implements IUserController.
-func (controller *userController) UpdateGeoLocation(e echo.Context) error {
-	reqUser := &types.UserGeoLocationRequest{}
-	if err := e.Bind(reqUser); err != nil {
-		return e.JSON(http.StatusBadRequest, "Invalid data")
-	}
-	if err := reqUser.Validate(); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	tempUserID := e.Param("id")
-	UserID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	existingUser, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	existingUser2, err := controller.Usersvc.GetAddress(&gorm.Model{ID: existingUser[0].AddressID})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	updateGeoLocation := &models.GeoLocation{
-		ID: 	 existingUser2[0].GeoLocationID,
-		Lat:     reqUser.Lat,
-		Lng:     reqUser.Lng,
-	}
-	if err := controller.Usersvc.UpdateGeoLocation(updateGeoLocation); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	return e.JSON(http.StatusOK, "GeoLocation updated successfully")
-}
-
-
-// CreateName implements IUserController.
-func (controller *userController) CreateName(e echo.Context) error {
-	reqUser := &types.UserNameRequest{}
-	if err := e.Bind(reqUser); err != nil {
-		return e.JSON(http.StatusBadRequest, "Invalid data")
-	}
-	if err := reqUser.Validate(); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	tempUserID := e.Param("id")
-	UserID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	existingUser, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	if existingUser[0].NameID != 0 {
-		return e.JSON(http.StatusBadRequest, "Name already exists")
-	}
-	name := &models.Name{
-		FirstName:     reqUser.FirstName,
-		LastName:      reqUser.LastName,
-	}
-	if err := controller.Usersvc.CreateName(name); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	updateUser := &models.User{
-		Model:     gorm.Model{ID: uint(UserID), UpdatedAt: time.Now(), CreatedAt: existingUser[0].CreatedAt, DeletedAt: existingUser[0].DeletedAt},
-		Username: existingUser[0].Username,
-		Email: existingUser[0].Email,
-		Password: existingUser[0].Password,
-		Phone: existingUser[0].Phone,
-		AddressID: existingUser[0].AddressID,
-		NameID: name.ID,
-	}
-	if err := controller.Usersvc.UpdateUser(updateUser); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	return e.JSON(http.StatusOK, "Name created successfully")
-}
-
-// UpdateName implements IUserController.
-func (controller *userController) UpdateName(e echo.Context) error {
-	reqUser := &types.UserNameRequest{}
-	if err := e.Bind(reqUser); err != nil {
-		return e.JSON(http.StatusBadRequest, "Invalid data")
-	}
-	if err := reqUser.Validate(); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	tempUserID := e.Param("id")
-	UserID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	existingUser, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	updateName := &models.Name{
-		ID: 	 existingUser[0].NameID,
-		FirstName:     reqUser.FirstName,
-		LastName:      reqUser.LastName,
-	}
-	if err := controller.Usersvc.UpdateName(updateName); err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	return e.JSON(http.StatusOK, "Name updated successfully")
-}
-
-
-// GetName implements IUserController.
-func (controller *userController) GetName(e echo.Context) error {
-	tempUserID := e.Param("id")
-	NameID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	existingUser, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(NameID)})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	name, err := controller.Usersvc.GetName(&gorm.Model{ID: existingUser[0].NameID})
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, err.Error())
-	}
-	return e.JSON(http.StatusOK, name)
-}
-

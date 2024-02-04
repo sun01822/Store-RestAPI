@@ -33,9 +33,6 @@ func migrate() {
 	db.Migrator().AutoMigrate(&models.User{})
 	db.Migrator().AutoMigrate(&models.Cart{})
 	db.Migrator().AutoMigrate(&models.ProductsInCart{})
-	db.Migrator().AutoMigrate(&models.Name{})
-	db.Migrator().AutoMigrate(&models.Address{})
-	db.Migrator().AutoMigrate(&models.GeoLocation{})
 }
 
 // calling to connect fucntion to initialize connection

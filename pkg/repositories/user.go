@@ -54,18 +54,18 @@ func (u *userRepo) GetUsers(model *gorm.Model) ([]models.User, error) {
 }
 
 // GetUsers implements domain.IUserRepo interface
-func (u *userRepo) GetUsersInfo(model *gorm.Model) ([]models.UserInfo, error) {
-	var users []models.UserInfo
+func (u *userRepo) GetUsersInfo(model *gorm.Model) ([]models.User, error) {
+	var users []models.User
 	var err error
 	userID := model.ID
 
 	if userID != 0 {
-		err = u.db.Raw("SELECT * FROM users Inner Join addresses on users.address_id = addresses.id Inner Join geo_locations on addresses.geo_location_id = geo_locations.id Inner Join names on users.name_id = names.id  where users.id = ?", userID, "and users.deleted_at is null").Scan(&users).Error
+		err = u.db.Where("id = ?", userID).Find(&users).Error
 	} else {
-		err = u.db.Raw("SELECT * FROM users Inner Join addresses on users.address_id = addresses.id Inner Join geo_locations on addresses.geo_location_id = geo_locations.id Inner Join names on users.name_id = names.id where users.deleted_at is null").Scan(&users).Error
+		err = u.db.Find(&users).Error
 	}
 	if err != nil {
-		return []models.UserInfo{}, err
+		return []models.User{}, err
 	}
 	return users, nil
 }
@@ -107,95 +107,6 @@ func (u *userRepo) DeleteUser(model *gorm.Model) error {
 // UpdateUser implements domain.IUserRepo interface
 func (u *userRepo) UpdateUser(user *models.User) error {
 	err := u.db.Save(&user).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// CreateAddress implements domain.IUserRepo.
-func (u *userRepo) CreateAddress(address *models.Address) error {
-	err := u.db.Create(&address).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// GetAddress implements domain.IUserRepo.
-func (u *userRepo) GetAddress(model *gorm.Model) ([]models.Address, error) {
-	var address []models.Address
-	var err error
-	addressID := model.ID
-	if addressID == 0 {
-		err = u.db.Find(&address).Error
-	} else {
-		err = u.db.Where("id = ?", addressID).Find(&address).Error
-	}
-	if err != nil {
-		return []models.Address{}, err
-	}
-	return address, nil
-}
-
-// UpdateAddress implements domain.IUserRepo.
-func (u *userRepo) UpdateAddress(address *models.Address) error {
-	err := u.db.Save(&address).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// CreateGeoLocation implements domain.IUserRepo.
-func (u *userRepo) CreateGeoLocation(geoLocation *models.GeoLocation) error {
-	err := u.db.Create(&geoLocation).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-
-// UpdateGeoLocation implements domain.IUserRepo.
-func (u *userRepo) UpdateGeoLocation(geoLocation *models.GeoLocation) error {
-	err := u.db.Save(&geoLocation).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-
-// CreateName implements domain.IUserRepo.
-func (u *userRepo) CreateName(name *models.Name) error {
-	err := u.db.Create(&name).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// GetName implements domain.IUserRepo.
-func (u *userRepo) GetName(model *gorm.Model) ([]models.Name, error) {
-	var name []models.Name
-	var err error
-	nameID := model.ID
-	if nameID == 0 {
-		err = u.db.Find(&name).Error
-	} else {
-		err = u.db.Where("id = ?", nameID).Find(&name).Error
-	}
-	if err != nil {
-		return []models.Name{}, err
-	}
-	return name, nil
-}
-
-
-// UpdateName implements domain.IUserRepo.
-func (u *userRepo) UpdateName(name *models.Name) error {
-	err := u.db.Save(&name).Error
 	if err != nil {
 		return err
 	}
