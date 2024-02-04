@@ -12,23 +12,6 @@ type IUserRepo interface {
 	UpdateUser(user *models.User) error
 	DeleteUser(*gorm.Model) error
 	LoginUser(user *models.User) error
-	GetUsersInfo(*gorm.Model)([]models.UserInfo, error)
-
-
-	CreateAddress(address *models.Address) error
-	GetAddress(*gorm.Model)([]models.Address, error)
-	UpdateAddress(address *models.Address) error
-
-
-
-	CreateGeoLocation(geoLocation *models.GeoLocation) error
-	UpdateGeoLocation(geoLocation *models.GeoLocation) error
-
-
-	CreateName(name *models.Name) error
-	GetName(*gorm.Model)([]models.Name, error)
-	UpdateName(name *models.Name) error
-
 }
 
 // for service operation (response to contorller || call from controller)
@@ -38,19 +21,4 @@ type IUserService interface {
 	UpdateUser(user *models.User) error
 	DeleteUser(*gorm.Model) error
 	LoginUser(user *models.User) error
-	GetUsersInfo(*gorm.Model)([]models.UserInfo, error)
-
-
-	CreateAddress(address *models.Address) error
-	GetAddress(*gorm.Model)([]models.Address, error)
-	UpdateAddress(address *models.Address) error
-
-
-	CreateGeoLocation(geoLocation *models.GeoLocation) error
-	UpdateGeoLocation(geoLocation *models.GeoLocation) error
-
-	CreateName(name *models.Name) error
-	GetName(*gorm.Model)([]models.Name, error)
-	UpdateName(name *models.Name) error
-	
 }

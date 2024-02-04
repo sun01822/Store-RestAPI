@@ -28,23 +28,9 @@ func (us *userRoutes) initUserRoutes(e *echo.Echo) {
 
 	user.POST("/user", us.userController.CreateUser)
 	user.GET("/user", us.userController.GetUsers)
-	user.GET("/user/info", us.userController.GetUsersInfo)
 	user.DELETE("/user/:id", us.userController.DeleteUser)
 	user.PUT("/user/:id", us.userController.UpdateUser)
 	user.POST("/login", us.userController.LoginUser)
-
-	user.POST("/user/address/:id", us.userController.CreateAddress)
-	user.PUT("/user/address/:id", us.userController.UpdateAddress)
-	user.GET("/user/address/:id", us.userController.GetAddress)
-
-
-	user.POST("/user/address/geolocation/:id", us.userController.CreateGeoLocation)
-	user.PUT("/user/address/geolocation/:id", us.userController.UpdateGeoLocation)
-
-	
-	user.POST("/user/name/:id", us.userController.CreateName)
-	user.PUT("/user/name/:id", us.userController.UpdateName)
-	user.GET("/user/name/:id", us.userController.GetName)
 }
 
 
