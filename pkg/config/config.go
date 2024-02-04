@@ -25,7 +25,7 @@ func InitConfig() *Config {
 
 	// automatically reads the config vars
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("Error reading config file", err)
+		log.Fatal("Error reading env file", err)
 	}
 	var config * Config
 	// converts the read config vars into mapped struct type
