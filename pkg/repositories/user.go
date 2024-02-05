@@ -24,7 +24,7 @@ func UserDBInstance(db *gorm.DB) domain.IUserRepo {
 func (u *userRepo) LoginUser(user *models.User) error {
 	// Find the user by user_name
 	var existingUser models.User
-	if err := u.db.Where("user_name = ?", user.Username).First(&existingUser).Error; err != nil {
+	if err := u.db.Where("email = ?", user.Email).First(&existingUser).Error; err != nil {
 		return err
 	}
 

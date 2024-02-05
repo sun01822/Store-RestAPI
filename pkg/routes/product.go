@@ -2,6 +2,7 @@ package routes
 
 import (
 	"Store_RestAPI/pkg/controllers"
+	"Store_RestAPI/pkg/middlewares"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,11 +27,11 @@ func (pro *productRoutes) initProductRoutes(e *echo.Echo) {
 	// grouping route endpoints
 	product := e.Group("/store")
 
-	product.POST("/product", pro.productController.CreateProduct)
+	product.POST("/product", pro.productController.CreateProduct, middlewares.Auth)
 	product.GET("/product", pro.productController.GetProducts)
 	product.GET("/product/:id", pro.productController.GetProductByID)
-	product.DELETE("/product/:id", pro.productController.DeleteProduct)
-	product.PUT("/product/:id", pro.productController.UpdateProduct)
+	product.DELETE("/product/:id", pro.productController.DeleteProduct, middlewares.Auth)
+	product.PUT("/product/:id", pro.productController.UpdateProduct, middlewares.Auth)
 }
 
 

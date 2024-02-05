@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"Store_RestAPI/pkg/config"
 )
 
 // IUserController is an interface for user controller
@@ -168,7 +169,7 @@ func (controller *userController) UpdateUser(e echo.Context) error {
 
 // LoginUser implements IUserController.
 func (controller *userController) LoginUser(e echo.Context) error {
-	//config := config.LocalConfig
+	config := config.LocalConfig
 	reqUser := &types.UserRequest{}
 	if err := e.Bind(reqUser); err != nil {
 		return e.JSON(http.StatusBadRequest, "Invalid data")
@@ -191,7 +192,7 @@ func (controller *userController) LoginUser(e echo.Context) error {
 		NotBefore: now.Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("secret"))
+	tokenString, err := token.SignedString([]byte(config.JWTSecret))
 	if err != nil {
 		return e.JSON(http.StatusBadRequest, err.Error())
 	}
