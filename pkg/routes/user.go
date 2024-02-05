@@ -28,6 +28,7 @@ func (us *userRoutes) initUserRoutes(e *echo.Echo) {
 
 	user.POST("/user", us.userController.CreateUser)
 	user.GET("/user", us.userController.GetUsers)
+	user.GET("/user/:id", us.userController.GetUserByID)
 	user.DELETE("/user/:id", us.userController.DeleteUser)
 	user.PUT("/user/:id", us.userController.UpdateUser)
 	user.POST("/login", us.userController.LoginUser)
