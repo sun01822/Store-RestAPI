@@ -8,6 +8,7 @@ import (
 // for database Repository operation (call from service)
 type IUserRepo interface {
 	GetUsers(*gorm.Model)([]models.User, error)
+	GetUserByID(ID uint)(models.User, error)
 	CreateUser(user *models.User) error
 	UpdateUser(user *models.User) error
 	DeleteUser(*gorm.Model) error
@@ -17,6 +18,7 @@ type IUserRepo interface {
 // for service operation (response to contorller || call from controller)
 type IUserService interface {
 	GetUsers(*gorm.Model)([]models.User, error)
+	GetUserByID(ID uint)(models.User, error)
 	CreateUser(user *models.User) error
 	UpdateUser(user *models.User) error
 	DeleteUser(*gorm.Model) error

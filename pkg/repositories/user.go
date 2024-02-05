@@ -39,36 +39,24 @@ func (u *userRepo) LoginUser(user *models.User) error {
 // GetUsers implements domain.IUserRepo interface
 func (u *userRepo) GetUsers(model *gorm.Model) ([]models.User, error) {
 	var users []models.User
-	var err error
-	userID := model.ID
-
-	if userID != 0 {
-		err = u.db.Where("id = ?", userID).Find(&users).Error
-	} else {
-		err = u.db.Find(&users).Error
-	}
+	err := u.db.Find(&users).Error
 	if err != nil {
 		return []models.User{}, err
 	}
 	return users, nil
 }
 
-// GetUsers implements domain.IUserRepo interface
-func (u *userRepo) GetUsersInfo(model *gorm.Model) ([]models.User, error) {
-	var users []models.User
-	var err error
-	userID := model.ID
-
-	if userID != 0 {
-		err = u.db.Where("id = ?", userID).Find(&users).Error
-	} else {
-		err = u.db.Find(&users).Error
-	}
+// GetUserByID implements domain.IUserRepo interface
+func (u *userRepo) GetUserByID(ID uint) (models.User, error) {
+	var user models.User
+	err := u.db.Where("id = ?", ID).First(&user).Error
 	if err != nil {
-		return []models.User{}, err
+		return models.User{}, err
 	}
-	return users, nil
+	return user, nil
 }
+
+
 
 // CreateUser implements domain.IUserRepo interface
 func (u *userRepo) CreateUser(user *models.User) error {

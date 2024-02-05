@@ -26,17 +26,22 @@ func Serve(e *echo.Echo) {
 
 	// Repository initializations
 	userRepository := repositories.UserDBInstance(db)
+	productRepository := repositories.ProductDBInstance(db)
 
 	// Service initializations
 	userService := services.UserInstance(userRepository)
+	productService := services.ProductInstance(productRepository)
 
 	// Controller initializations
 	userController := controllers.NewUserController(userService)
-
+	productController := controllers.NewProductController(productService)
 
 	// Route initializations
 	user := routes.UserRoutes(e, userController)
 	user.InitUserRoutes()
+
+	product := routes.ProductRoutes(e, productController)
+	product.InitProductRoutes()
 
 	// Starting Server 
 	log.Fatal(e.Start(fmt.Sprintf(":%s", config.LocalConfig.Port)))

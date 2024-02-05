@@ -26,6 +26,3 @@ func (user UserRequest) Validate() error{
 		validate.Field(&user.Password, validate.Required, validate.Length(6, 20)),
 	)
 }
-
-
-

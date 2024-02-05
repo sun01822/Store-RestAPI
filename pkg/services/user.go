@@ -27,10 +27,19 @@ func (service *userService) GetUsers(model *gorm.Model) ([]models.User, error) {
 	var allUsers []models.User
 	user, _ := service.repo.GetUsers(model)
 	if len(user) == 0 {
-		return nil, errors.New("no users found")
+		return nil, errors.New("No users found")
 	}
 	allUsers = append(allUsers, user...)
 	return allUsers, nil
+}
+
+// GetUsersByID implements domain.IUserService.
+func (service *userService) GetUserByID(ID uint) (models.User, error) {
+	user, err := service.repo.GetUserByID(ID)
+	if err != nil {
+		return models.User{}, errors.New("User not found")
+	}
+	return user, nil
 }
 
 // CreateUser implements domain.IUserService.

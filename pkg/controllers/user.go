@@ -16,6 +16,7 @@ import (
 // IUserController is an interface for user controller
 type IUserController interface {
 	GetUsers(e echo.Context) error
+	GetUserByID(e echo.Context) error
 	CreateUser(e echo.Context) error
 	DeleteUser(e echo.Context) error
 	UpdateUser(e echo.Context) error
@@ -23,13 +24,13 @@ type IUserController interface {
 }
 
 type userController struct {
-	Usersvc domain.IUserService
+	usersvc domain.IUserService
 }
 
 // UserInstance is a function to create an instance of user controller
-func NewUserController(UserSvc domain.IUserService) IUserController {
+func NewUserController(userSvc domain.IUserService) IUserController {
 	return &userController{
-		Usersvc: UserSvc,
+		usersvc: userSvc,
 	}
 }
 
@@ -46,8 +47,11 @@ func (controller *userController) CreateUser(e echo.Context) error {
 		Email:    reqUser.Email,
 		Username: reqUser.Username,
 		Password: reqUser.Password,
+		Phone:    reqUser.Phone,
+		Name:     models.Name{FirstName: reqUser.FirstName, LastName: reqUser.LastName},
+		Address:  models.Address{City: reqUser.City, Street: reqUser.Street, Number: reqUser.Number, Zip: reqUser.Zip, GeoLocation: models.GeoLocation{Lat: reqUser.Lat, Lng: reqUser.Lng}},
 	}
-	if err := controller.Usersvc.CreateUser(user); err != nil {
+	if err := controller.usersvc.CreateUser(user); err != nil {
 		return e.JSON(http.StatusBadRequest, err.Error())
 	}
 	return e.JSON(http.StatusOK, "User created successfully")
@@ -55,17 +59,27 @@ func (controller *userController) CreateUser(e echo.Context) error {
 
 // GetUsers implements IUserController.
 func (controller *userController) GetUsers(e echo.Context) error {
-	tempUserID := e.QueryParam("userID")
-	UserID, err := strconv.ParseInt(tempUserID, 0, 0)
-	if err != nil && tempUserID != "" {
-		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
-	}
-	users, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
+	users, err := controller.usersvc.GetUsers(&gorm.Model{})
 	if err != nil {
 		return e.JSON(http.StatusBadRequest, err.Error())
 	}
 	return e.JSON(http.StatusOK, users)
 }
+
+// GetUsersByID implements IUserController.
+func (controller *userController) GetUserByID(e echo.Context) error {
+	tempUserID := e.Param("id")
+	UserID, err := strconv.ParseInt(tempUserID, 0, 0)
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
+	}
+	user, err := controller.usersvc.GetUserByID(uint(UserID))
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, err.Error())
+	}
+	return e.JSON(http.StatusOK, user)
+}
+
 
 
 // DeleteUser implements IUserController.
@@ -75,11 +89,11 @@ func (controller *userController) DeleteUser(e echo.Context) error {
 	if err != nil {
 		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
 	}
-	_, err = controller.Usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
+	_, err = controller.usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
 	if err != nil {
 		return e.JSON(http.StatusBadRequest, err.Error())
 	}
-	if err := controller.Usersvc.DeleteUser(&gorm.Model{ID: uint(UserID)}); err != nil {
+	if err := controller.usersvc.DeleteUser(&gorm.Model{ID: uint(UserID)}); err != nil {
 		return e.JSON(http.StatusBadRequest, err.Error())
 	}
 	return e.JSON(http.StatusOK, "User deleted successfully")
@@ -96,7 +110,7 @@ func (controller *userController) UpdateUser(e echo.Context) error {
 	if err != nil {
 		return e.JSON(http.StatusBadRequest, "Enter a valid User ID")
 	}
-	existingUser, err := controller.Usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
+	existingUser, err := controller.usersvc.GetUsers(&gorm.Model{ID: uint(UserID)})
 	if err != nil {
 		return e.JSON(http.StatusBadRequest, err.Error())
 	}
@@ -146,7 +160,7 @@ func (controller *userController) UpdateUser(e echo.Context) error {
 	if updateUser.Address.GeoLocation.Lng == "" {
 		updateUser.Address.GeoLocation.Lng = existingUser[0].Address.GeoLocation.Lng
 	}
-	if err := controller.Usersvc.UpdateUser(updateUser); err != nil {
+	if err := controller.usersvc.UpdateUser(updateUser); err != nil {
 		return e.JSON(http.StatusBadRequest, err.Error())
 	}
 	return e.JSON(http.StatusOK, "User updated successfully")
@@ -166,7 +180,7 @@ func (controller *userController) LoginUser(e echo.Context) error {
 		Email:    reqUser.Email,
 		Password: reqUser.Password,
 	}
-	if err := controller.Usersvc.LoginUser(user); err != nil {
+	if err := controller.usersvc.LoginUser(user); err != nil {
 		return e.JSON(http.StatusBadRequest, err.Error())
 	}
 	now := time.Now().UTC()
