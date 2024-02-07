@@ -27,14 +27,17 @@ func Serve(e *echo.Echo) {
 	// Repository initializations
 	userRepository := repositories.UserDBInstance(db)
 	productRepository := repositories.ProductDBInstance(db)
+	cartRepository := repositories.CartDBInstance(db)
 
 	// Service initializations
 	userService := services.UserInstance(userRepository)
 	productService := services.ProductInstance(productRepository)
+	cartService := services.CartInstance(cartRepository)
 
 	// Controller initializations
 	userController := controllers.NewUserController(userService)
 	productController := controllers.NewProductController(productService)
+	cartController := controllers.NewCartController(cartService)
 
 	// Route initializations
 	user := routes.UserRoutes(e, userController)
@@ -43,6 +46,9 @@ func Serve(e *echo.Echo) {
 	product := routes.ProductRoutes(e, productController)
 	product.InitProductRoutes()
 
+	cart := routes.CartRoutes(e, cartController)
+	cart.InitCartRoutes()
+	
 	// Starting Server 
 	log.Fatal(e.Start(fmt.Sprintf(":%s", config.LocalConfig.Port)))
 }
