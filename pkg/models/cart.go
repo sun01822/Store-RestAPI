@@ -1,17 +1,19 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Cart struct {
 	gorm.Model
 	UserID   uint         `json:"user_id"`
-	Date     string       `json:"date"`
-	Products []ProductsInCart `gorm:"foreignKey:CartID"`
+	Date     time.Time      `json:"date"`
+	Product ProductsInCart `json:"product" gorm:"embedded"`
 }
 
 type ProductsInCart struct {
-	ID 	  uint   `json:"id"`
 	ProductID uint `json:"product_id"`
-	CartID uint `json:"cart_id"`
 	Quantity uint `json:"quantity"`
 }

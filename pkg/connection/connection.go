@@ -31,7 +31,6 @@ func migrate() {
 	db.Migrator().AutoMigrate(&models.Product{})
 	db.Migrator().AutoMigrate(&models.User{})
 	db.Migrator().AutoMigrate(&models.Cart{})
-	db.Migrator().AutoMigrate(&models.ProductsInCart{})
 }
 
 // calling to connect fucntion to initialize connection
